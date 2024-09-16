@@ -20,6 +20,20 @@ class Pixie:
         self.model = models[self.model_name]
         self.model_url = "https://api-inference.huggingface.co/models/" + self.model
 
+    def prompt_generator(self, destination, days, budget, diet, interests, comments):
+        prompt = f"Generate travel itinerary to {destination}"
+        if days:
+            prompt += f" for {days} days"
+        if budget:
+            prompt += f" with a budget of {budget}"
+        if diet:
+            prompt += f" with a diet of {diet}"
+        if interests:
+            prompt += f" with interests in {', '.join(interests)}"        
+        if comments:
+            prompt += f". Additionally, {comments}"
+
+        return prompt
 
     def ask_pixie(self, query):
         response, status_code = self._get_response(query)

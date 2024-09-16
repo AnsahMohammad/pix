@@ -7,28 +7,31 @@ import time
 
 class Pixie:
     def __init__(self, model_name="mx-v1", timeout=100, max_tokens=5000):
-        self.model_name = model_name
+        self._initialize_model(model_name)
         self.timeout = timeout
         self.max_tokens = max_tokens
 
-    def ask_pixie(self, query):
-        response, status_code = self.get_response(query)
-        if status_code != 200:
-            response = "Sorry, I am not able to process your query at the moment."
-
-        # apply post-processing
-        return self.extract_json(response)
-
-    def get_response(self, query):
+    def _initialize_model(self, model_name):
+        self.model_name = model_name
         models = {
             "mx-v1": "mistralai/Mistral-7B-Instruct-v0.1/v1/chat/completions",
             "mx-v2": "mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions",
         }
-        model = models[self.model_name]
-        model_url = "https://api-inference.huggingface.co/models/" + model
+        self.model = models[self.model_name]
+        self.model_url = "https://api-inference.huggingface.co/models/" + self.model
 
+
+    def ask_pixie(self, query):
+        response, status_code = self._get_response(query)
+        if status_code != 200:
+            response = "Sorry, I am not able to process your query at the moment."
+
+        # apply post-processing
+        return self._extract_json(response)
+
+    def _get_response(self, query):
         data = {
-            "model": model,
+            "model": self.model,
             "messages": [
                 {
                     "role": "system",
@@ -48,7 +51,7 @@ class Pixie:
         }
 
         try:
-            response = requests.post(model_url, headers=headers, json=data, timeout=100)
+            response = requests.post(self.model_url, headers=headers, json=data, timeout=100)
             response_json = response.json()
             generated_text = (
                 response_json.get("choices", [{}])[0]
@@ -62,7 +65,7 @@ class Pixie:
 
         return generated_text, 200
 
-    def extract_json(self, text):
+    def _extract_json(self, text):
         pattern = r"{.*?}"
         matches = re.findall(pattern, text, re.DOTALL)
         json_content = []

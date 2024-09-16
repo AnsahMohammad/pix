@@ -20,8 +20,11 @@ def generate():
     
     prompt = pix.prompt_generator(destination, days, budget, diet, interests, comments)
     print("Prompt: ", prompt)
+
+    response = pix.ask_pixie(prompt)
+    print("Response: ", response)
     
-    return render_template('pixie.html')
+    return render_template('itinerary.html', itinerary=response)
 
 
 if __name__ == '__main__':

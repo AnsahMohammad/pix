@@ -21,11 +21,11 @@ class Pixie:
         self.model_url = "https://api-inference.huggingface.co/models/" + self.model
 
     def prompt_generator(self, destination, days, budget, diet, interests, comments):
-        prompt = f"Generate travel itinerary to {destination}"
+        prompt = f"Generate travel itinerary to {destination} with timings"
         if days:
             prompt += f" for {days} days"
-        if budget:
-            prompt += f" with a budget of {budget}"
+        # if budget:
+        #     prompt += f" with a budget of {budget}"
         if diet:
             prompt += f" with a diet of {diet}"
         if interests:
@@ -36,12 +36,18 @@ class Pixie:
         return prompt
 
     def ask_pixie(self, query):
-        response, status_code = self._get_response(query)
-        if status_code != 200:
-            response = "Sorry, I am not able to process your query at the moment."
+        try:
+            response, status_code = self._get_response(query)
+            if status_code != 200:
+                response = "Sorry, I am not able to process your query at the moment."
 
-        # apply post-processing
-        return self._extract_json(response)
+            response = self._extract_json(response)
+
+        except Exception as e:
+            print(f"Error while processing query: {e}")
+            response = "Sorry, I am not able to process your query at the moment"
+
+        return response
 
     def _get_response(self, query):
         data = {
@@ -50,7 +56,7 @@ class Pixie:
                 {
                     "role": "system",
                     "content": os.environ.get(
-                        "AI_INIT_PROMPT", "Generate travel itirinary for the query"
+                        "AI_INIT_PROMPT", "Generate travel itinerary for the query"
                     ),
                 },
                 {"role": "user", "content": query},
@@ -80,6 +86,10 @@ class Pixie:
         return generated_text, 200
 
     def _extract_json(self, text):
+        if not isinstance(text, str):
+            print(f"Expected string for text, but got {type(text).__name__}")
+            return []
+
         pattern = r"{.*?}"
         matches = re.findall(pattern, text, re.DOTALL)
         json_content = []

@@ -1,7 +1,8 @@
-import time
-import requests
 import json
 import os
+import re
+import requests
+import time
 
 
 def ask_pixie(query):
@@ -52,6 +53,16 @@ def process_query(query, model_name="mx-v1"):
 
     return generated_text, 200
 
+def extract_json(text):
+    pattern = r'{.*?}'
+    matches = re.findall(pattern, text, re.DOTALL)
+    json_content = []
+    for match in matches:
+        try:
+            json_content.append(json.loads(match))
+        except json.JSONDecodeError:
+            pass
+    return json_content
 
 def main():
     while True:
@@ -63,10 +74,17 @@ def main():
         response = ask_pixie(query)
         end = time.time()
 
-        # post-answer processing : performing actions, or replying question
+        # print("response  : ", response)
+
+        processed_response = extract_json(response)
 
         print("Time taken: ", end - start)
-        print("pixie: ", response)
+
+        for response in processed_response:
+            print(response)
+        
+        print("-"*50)
+
 
 
 if __name__ == "__main__":

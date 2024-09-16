@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixie Itinerary Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-top: 2%;
+        }
+        .form-group label {
+            width: 150px;
+            margin-right: 10px;
+        }
+        .form-group input[type="text"], 
+        .form-group input[type="number"], 
+        .form-group input[type="date"], 
+        .form-group textarea {
+            flex: 1;
+            padding: 6px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 2%;
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        input[type="submit"] {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Itinerary Planner</h1>
+    <form action="/generate" method="POST">
+        <div class="form-group">
+            <label for="destination">Destination:</label>
+            <input type="text" id="destination" name="destination" required>
+        </div>
+
+        <div class="form-group">
+            <label for="days">Number of Days:</label>
+            <input type="number" id="days" name="days" required>
+        </div>
+
+        <div class="form-group">
+            <label for="date">Date of Visit:</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+
+        <div class="form-group">
+            <label for="budget">Budget ($):</label>
+            <input type="number" id="budget" name="budget" required>
+        </div>
+
+        <div class="form-group">
+            <label for="diet">Dietary Preferences:</label>
+            <input type="text" id="diet" name="diet" placeholder="e.g., Vegetarian, Vegan, None">
+        </div>
+
+        <label>Interests:</label><br>
+        <div class="checkbox-group"> 
+            <input type="checkbox" id="cultural" name="interests" value="cultural">
+            <label for="cultural">Cultural</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="nightlife" name="interests" value="nightlife">
+            <label for="nightlife">Nightlife</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="food" name="interests" value="food">
+            <label for="food">Food</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="religious" name="interests" value="religious">
+            <label for="religious">Religious</label>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="comments">Additional Comments:</label>
+            <textarea id="comments" name="comments" rows="4" placeholder="Any specific preferences or requirements..."></textarea>
+        </div>
+
+        <input type="submit" value="Generate Itinerary">
+    </form>
+</body>
+</html>

@@ -21,9 +21,9 @@ class Pixie:
         self.model_url = "https://api-inference.huggingface.co/models/" + self.model
 
     def prompt_generator(self, destination, days, budget, diet, interests, comments):
-        prompt = f"Generate travel itinerary to {destination} with timings"
+        prompt = f"Generate travel itinerary to {destination}"
         if days:
-            prompt += f" for {days} days"
+            prompt += f" for {days+1} days"
         # if budget:
         #     prompt += f" with a budget of {budget}"
         if diet:

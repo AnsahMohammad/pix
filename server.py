@@ -11,7 +11,7 @@ def home():
 @app.route('/generate', methods=['POST'])
 def generate():
     destination = request.form['destination']
-    days = request.form['days']
+    days = int(request.form['days'])
     date = request.form['date']
     budget = request.form['budget']
     diet = request.form['diet']

@@ -13,6 +13,12 @@
             align-items: center;
             flex-direction: column;
         }
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         h1, h2 {
             text-align: center;
         }
@@ -32,10 +38,23 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        .print-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .print-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
-    <h1>Itinerary</h1>
+    <div class="header">
+        <h1>Itinerary</h1>
+        <button class="print-button" onclick="window.print()">Print Itinerary</button>
+    </div>
     {% for day in itinerary %}
         <div class="day-section">
             <h2>Day {{ loop.index }}</h2>

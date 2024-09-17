@@ -67,6 +67,23 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <h3>Highlights of the Day</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Entities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entity_type, entity_list in entities[loop.index0].items() %}
+                        <tr>
+                            <td>{{ entity_type }}</td>
+                            <td>{{ entity_list | join(', ') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% endfor %}
 </body>

@@ -30,7 +30,7 @@ class Pixie:
         if diet:
             prompt += f" with a diet of {diet}"
         if interests:
-            prompt += f" with interests in {', '.join(interests)}"        
+            prompt += f" with interests in {', '.join(interests)}"
         if comments:
             prompt += f". Additionally, {comments}"
 
@@ -45,19 +45,43 @@ class Pixie:
                 response = "Sorry, I am not able to process your query at the moment."
 
             response = self._extract_json(response)
-            
+
             for res in response:
                 day = []
                 for value in res.values():
                     day.append(self.extract_entities(value))
                 entities.append(day)
 
+            entities = self.process_entities(entities)
+
         except Exception as e:
             print(f"Error while processing query: {e}")
             response = "Sorry, I am not able to process your query at the moment"
 
-
         return response, entities
+
+    def extract_entities(self, text):
+        nlp = spacy.load("en_core_web_sm")
+        doc = nlp(text)
+        entities = [(ent.text, ent.label_) for ent in doc.ents]
+        return entities
+
+    def process_entities(self, entities):
+        processed_entities = []
+        for day in entities:
+            activities = [activity for sublist in day for activity in sublist]
+            processed_entities.append(activities)
+        
+        organized_entities = self.organize_entities(processed_entities)
+
+        return organized_entities
+
+    def organize_entities(self, processed_entities):
+        organized_entities = []
+        for day in processed_entities:
+            organized_entities.append(self._organize_entity(day))
+
+        return organized_entities
 
     def _get_response(self, query):
         data = {
@@ -81,7 +105,9 @@ class Pixie:
         }
 
         try:
-            response = requests.post(self.model_url, headers=headers, json=data, timeout=100)
+            response = requests.post(
+                self.model_url, headers=headers, json=data, timeout=100
+            )
             response_json = response.json()
             generated_text = (
                 response_json.get("choices", [{}])[0]
@@ -109,17 +135,23 @@ class Pixie:
             except json.JSONDecodeError:
                 pass
         return json_content
-    
-    def extract_entities(self, text):
-        nlp = spacy.load("en_core_web_sm")
-        doc = nlp(text)
-        entities = [(ent.text, ent.label_) for ent in doc.ents]
-        return entities
+
+    def _organize_entity(self, entities):
+        """
+        entities is list of tuples eg : [('the Grand Canyon', 'LOC')]
+        (per day)
+        """
+        organized_entity = {"GPE": [], "LOC": [], "ORG": []}
+
+        for object, entity in entities:
+            if entity in organized_entity:
+                organized_entity[entity].append(object)
+
+        return organized_entity
 
 
 def main():
     pix = Pixie()
-
 
     while True:
         query = input("Ask pixie: ")
@@ -134,12 +166,7 @@ def main():
         for res in response:
             print(res)
 
-        print("Entities : ")
-        for day in entities:
-            print("Day : ", end = " ")
-            for entity in day:
-                print(entity, end = " | ")
-            print()
+        print("Entities : ", entities)
 
         print("-" * 50)
 

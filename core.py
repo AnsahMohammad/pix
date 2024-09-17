@@ -110,7 +110,9 @@ class Pixie:
         }
 
         try:
-            response = requests.get(search_url, params=params, headers=headers, timeout=10)
+            response = requests.get(
+                search_url, params=params, headers=headers, timeout=10
+            )
             response.raise_for_status()
 
             soup = BeautifulSoup(response.text, "html.parser")
@@ -199,11 +201,12 @@ class Pixie:
         entities is list of tuples eg : [('the Grand Canyon', 'LOC')]
         (per day)
         """
-        organized_entity = {"GPE": [], "LOC": [], "ORG": []}
+        organized_entity = {"GPE": [], "LOC": [], "ORG": [], "images": []}
 
         for object, entity in entities:
             if entity in organized_entity:
                 organized_entity[entity].append(object)
+                organized_entity["images"].append(self.fetch_image(object))
 
         return organized_entity
 

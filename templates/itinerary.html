@@ -48,6 +48,33 @@
         .print-button:hover {
             background-color: #45a049;
         }
+        .image-section {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .image-container .overlay {
+            position: absolute;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .image-container:hover .overlay {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -67,23 +94,22 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <h3>Highlights of the Day</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Entities</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for entity_type, entity_list in entities[loop.index0].items() %}
-                        <tr>
-                            <td>{{ entity_type }}</td>
-                            <td>{{ entity_list | join(', ') }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="image-section">
+                {% for image in entities[loop.index0].images %}
+                    {% if image != 'No image found on the page.' %}
+                        <div class="image-container">
+                            <img src="{{ image }}" alt="Image">
+                            <div class="overlay">
+                                {% for entity_type, entity_list in entities[loop.index0].items() %}
+                                    {% if entity_type != 'images' %}
+                                        {{ entity_type }}: {{ entity_list | join(', ') }}<br>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
     {% endfor %}
 </body>

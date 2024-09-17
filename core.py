@@ -2,6 +2,7 @@ import json
 import os
 import re
 import requests
+import spacy
 import time
 
 
@@ -36,18 +37,27 @@ class Pixie:
         return prompt
 
     def ask_pixie(self, query):
+        entities = []
+
         try:
             response, status_code = self._get_response(query)
             if status_code != 200:
                 response = "Sorry, I am not able to process your query at the moment."
 
             response = self._extract_json(response)
+            
+            for res in response:
+                day = []
+                for value in res.values():
+                    day.append(self.extract_entities(value))
+                entities.append(day)
 
         except Exception as e:
             print(f"Error while processing query: {e}")
             response = "Sorry, I am not able to process your query at the moment"
 
-        return response
+
+        return response, entities
 
     def _get_response(self, query):
         data = {
@@ -99,22 +109,37 @@ class Pixie:
             except json.JSONDecodeError:
                 pass
         return json_content
+    
+    def extract_entities(self, text):
+        nlp = spacy.load("en_core_web_sm")
+        doc = nlp(text)
+        entities = [(ent.text, ent.label_) for ent in doc.ents]
+        return entities
 
 
 def main():
     pix = Pixie()
 
+
     while True:
         query = input("Ask pixie: ")
 
         start = time.time()
-        response = pix.ask_pixie(query)
+        response, entities = pix.ask_pixie(query)
         end = time.time()
 
         print("Time taken: ", end - start)
 
+        print("Response : ")
         for res in response:
             print(res)
+
+        print("Entities : ")
+        for day in entities:
+            print("Day : ", end = " ")
+            for entity in day:
+                print(entity, end = " | ")
+            print()
 
         print("-" * 50)
 

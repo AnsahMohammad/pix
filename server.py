@@ -21,8 +21,9 @@ def generate():
     prompt = pix.prompt_generator(destination, days, budget, diet, interests, comments)
     print("Prompt: ", prompt)
 
-    response = pix.ask_pixie(prompt)
+    response, entities = pix.ask_pixie(prompt)
     print("Response: ", response)
+    print("Entities: ", entities)
     
     return render_template('itinerary.html', itinerary=response)
 

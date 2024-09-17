@@ -4,6 +4,8 @@ import re
 import requests
 import spacy
 import time
+import requests
+from bs4 import BeautifulSoup
 
 
 class Pixie:
@@ -71,7 +73,7 @@ class Pixie:
         for day in entities:
             activities = [activity for sublist in day for activity in sublist]
             processed_entities.append(activities)
-        
+
         organized_entities = self.organize_entities(processed_entities)
 
         return organized_entities
@@ -82,6 +84,62 @@ class Pixie:
             organized_entities.append(self._organize_entity(day))
 
         return organized_entities
+
+    def fetch_image(self, query):
+        """
+        Fetches the main image URL from the first Wikipedia search result.
+
+        Args:
+        - query (str): Search query.
+
+        Returns:
+        - str: Image URL or error message.
+        """
+
+        # Wikipedia search URL and parameters
+        search_url = "https://en.wikipedia.org/w/index.php"
+        params = {
+            "search": query,
+            "title": "Special:Search",
+            "profile": "default",
+            "fulltext": 1,
+            "ns0": 1,
+        }
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
+
+        try:
+            response = requests.get(search_url, params=params, headers=headers, timeout=10)
+            response.raise_for_status()
+
+            soup = BeautifulSoup(response.text, "html.parser")
+            first_result = soup.find("div", class_="mw-search-result-heading")
+
+            if not first_result:
+                return "No search results found."
+
+            # Extract first result link
+            first_link = first_result.find("a")["href"]
+            page_url = f"https://en.wikipedia.org{first_link}"
+
+            # Send request to first result page
+            page_response = requests.get(page_url, headers=headers, timeout=10)
+            page_response.raise_for_status()
+
+            page_soup = BeautifulSoup(page_response.text, "html.parser")
+            main_image = page_soup.select_one("table.infobox img")
+
+            if main_image:
+                image_url = f"https:{main_image['src']}"
+                return image_url
+            else:
+                return "No image found on the page."
+
+        except requests.RequestException as e:
+            return f"Error fetching image: {e}"
+        except Exception as e:
+            return f"An unexpected error occurred: {e}"
 
     def _get_response(self, query):
         data = {

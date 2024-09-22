@@ -24,6 +24,9 @@ class Pixie:
         self.model_url = "https://api-inference.huggingface.co/models/" + self.model
 
     def prompt_generator(self, destination, days, budget, diet, interests, comments):
+        """
+        Generates a prompt to be fed into the LLM based on input
+        """
         prompt = f"Generate travel itinerary to {destination}"
         if days:
             prompt += f" for {days+1} days"
@@ -39,6 +42,10 @@ class Pixie:
         return prompt
 
     def ask_pixie(self, query):
+        """
+        Ask the LLM to generate a travel itinerary based on the query.
+        
+        """
         entities = []
 
         try:
@@ -63,12 +70,18 @@ class Pixie:
         return response, entities
 
     def extract_entities(self, text):
+        """
+        Extracts entities from the text using spaCy.
+        """
         nlp = spacy.load("en_core_web_sm")
         doc = nlp(text)
         entities = [(ent.text, ent.label_) for ent in doc.ents]
         return entities
 
     def process_entities(self, entities):
+        """
+        Processes the entities extracted from the text.
+        """
         processed_entities = []
         for day in entities:
             activities = [activity for sublist in day for activity in sublist]
@@ -79,6 +92,9 @@ class Pixie:
         return organized_entities
 
     def organize_entities(self, processed_entities):
+        """
+        Organizes the entities into a dictionary based on their entity type.
+        """
         organized_entities = []
         for day in processed_entities:
             organized_entities.append(self._organize_entity(day))

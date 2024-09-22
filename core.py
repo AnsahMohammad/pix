@@ -28,7 +28,7 @@ class Pixie:
         if days:
             prompt += f" for {days+1} days"
         # if budget:
-        #     prompt += f" with a budget of {budget}"
+            # prompt += f" with a budget of {budget}"
         if diet:
             prompt += f" with a diet of {diet}"
         if interests:
@@ -203,10 +203,10 @@ class Pixie:
         """
         organized_entity = {"GPE": [], "LOC": [], "ORG": [], "images": []}
 
-        for object, entity in entities:
+        for obj, entity in entities:
             if entity in organized_entity:
-                organized_entity[entity].append(object)
-                organized_entity["images"].append(self.fetch_image(object))
+                organized_entity[entity].append(obj)
+                organized_entity["images"].append(self.fetch_image(obj))
 
         return organized_entity
 
@@ -221,15 +221,13 @@ def main():
         response, entities = pix.ask_pixie(query)
         end = time.time()
 
-        print("Time taken: ", end - start)
+        print("Processing time : ", end - start)
 
         print("Response : ")
         for res in response:
             print(res)
 
         print("Entities : ", entities)
-
-        print("-" * 50)
 
 
 if __name__ == "__main__":
